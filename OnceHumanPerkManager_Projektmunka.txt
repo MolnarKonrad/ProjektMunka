@@ -1,0 +1,8 @@
+Once Human nevű játékhoz egy memtics perk manger programot szeretnék késziteni az alábbi lehetőségekkel:
+- A játékon belül egy HIVE vagy guild 8 tagot tartalmazhat, minden tagnak 10 perkje lehet.
+- A játékosok tudják kezelni saját karkaterük perkjeit sima név alapú kereséssel a perkek meglévő listájából
+- A játékosok csak saját karakterük képességeit szerkeszthessék
+- A perkek adottak, valamilyen adatbázis vagy adatszerkezet tartalmazza azok neveit, tulajdonságaikat (milyen plusszt adnak)
+- A játékosok között van egy leader, csak ő adhat hozzá vagy távolithat el tagokat
+- A program tárolja a változtatásokat, mentse az adatokat minden változtatás után.
+ 

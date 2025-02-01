@@ -122,4 +122,22 @@ public class GameManager {
         }
         return false;
     }
+
+//    public boolean addTestMemberToDatabase(Member member) {
+//        if (member.getName() == null || member.getName().trim().isEmpty()) {
+//            throw new IllegalArgumentException("A név megadása kötelező.");
+//        }
+//        if (isMemberExists(member.getName())) {
+//            throw new IllegalArgumentException("A tag már létezik az adatbázisban.");
+//        }
+//        if (member.getName().matches(".*\\d.*")) {
+//            throw new IllegalArgumentException("A név nem lehet számokból álló karakterlánc.");
+//        }
+//
+//        return true;
+//    }
+//
+//    private boolean isMemberExists(String name) {
+//        return false;
+//    }
 }

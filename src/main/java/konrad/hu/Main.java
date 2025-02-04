@@ -53,6 +53,10 @@ public class Main {
             System.out.println("\n --- Menük ---");
             System.out.println("1. Tag hozzáadása");
             System.out.println("2. Tag eltávolítása");
+            System.out.println("3. Perk hozzáadása taghoz");
+            System.out.println("4. Tag perk-jeinek listázása");
+            System.out.println("5. Tag perk-jének cseréje");
+            System.out.println("6. Kilépés");
 
             System.out.println("Válassz egy lehetőséget: ");
             int choice = scanner.nextInt();
@@ -79,6 +83,34 @@ public class Main {
                     } else {
                         System.out.println("Tag eltávolítva: " + memberToRemove);
                     }
+                    break;
+                case 3:
+                    System.out.print("Tag neve, akinek perk hozzáadása: ");
+                    String targetMemberName = scanner.nextLine();
+                    System.out.print("Megadott perk neve: ");
+                    String perkName = scanner.nextLine();
+                    gameManager.addPerkToMember(targetMemberName, perkName);
+                    break;
+                case 4:
+                    System.out.print("Tag neve a perkek listázásához: ");
+                    String memberNameToList = scanner.nextLine();
+                    gameManager.listMemberPerks(memberNameToList);
+                    break;
+                case 5:
+                    System.out.print("Tag neve, akinek perkjét cserélni szeretnéd: ");
+                    String memberNameForReplace = scanner.nextLine();
+                    System.out.print("Régi perk neve: ");
+                    String oldPerkName = scanner.nextLine();
+                    System.out.print("Új perk neve: ");
+                    String newPerkName = scanner.nextLine();
+                    gameManager.replaceMemberPerk(memberNameForReplace, oldPerkName, newPerkName);
+                    break;
+                case 6:
+                    System.out.println("Kilépés...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Érvénytelen választás, próbáld újra.");
                     break;
             }
         }

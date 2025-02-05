@@ -13,8 +13,6 @@ public class GameManager {
         members = new HashSet<>();
         perks = new HashMap<>();
         connectToDatabase();
-//        loadMembersFromFile("members.txt");
-//        loadPerksFromFile("perks.ser");
     }
 
     private void connectToDatabase() {
@@ -51,7 +49,7 @@ public class GameManager {
         } catch (SQLException e) {
             System.out.println("Hiba a tag keresésekor: " + e.getMessage());
         }
-        return null; // Ha nem található
+        return null;
     }
 
     public void addMemberToDatabase(Member member){
@@ -62,33 +60,40 @@ public class GameManager {
             stmt.setBoolean(2, member.isLeader());
             stmt.executeUpdate();
             members.add(member);
-            saveMembersToFile();
+            saveMembersToFile("members.txt");
             System.out.println("Tag hozzáadva: " + member.getName());
         } catch (SQLException e) {
             System.out.println("Hiba a tag hozzáadásakor: " + e.getMessage());
         }
+        saveMembersToFile("members.txt");
     }
 
     public boolean removeMemberFromDatabase(String memberNameToDelete) {
+        String deletePerksQuery = "DELETE FROM members_perks WHERE member_id = (SELECT id FROM members WHERE name = ?)";
+        String deleteMemberQuery = "DELETE FROM members WHERE name = ?";
 
-        String query = "DELETE FROM members WHERE name = ?";
-        boolean isLeader = false;
+        try (PreparedStatement deletePerksStmt = connection.prepareStatement(deletePerksQuery);
+             PreparedStatement deleteMemberStmt = connection.prepareStatement(deleteMemberQuery)) {
 
-        if (isLeader(memberNameToDelete)) {
-            isLeader = true;
-        }
+            deletePerksStmt.setString(1, memberNameToDelete);
+            deletePerksStmt.executeUpdate();
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, memberNameToDelete);
-            stmt.executeUpdate();
+            deleteMemberStmt.setString(1, memberNameToDelete);
+            int rowsDeleted = deleteMemberStmt.executeUpdate();
+
+            if (rowsDeleted > 0) {
+                System.out.println("Tag sikeresen törölve: " + memberNameToDelete);
+                return true;
+            } else {
+                System.out.println("A megadott tag nem található.");
+            }
         } catch (SQLException e) {
             System.out.println("Hiba a tag eltávolításakor: " + e.getMessage());
         }
-
-        return isLeader;
+        return false;
     }
 
-    private boolean isLeader(String memberName) {
+    public boolean isLeader(String memberName) {
         String query = "SELECT is_leader FROM members WHERE name = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, memberName);
@@ -132,21 +137,17 @@ public class GameManager {
         return false;
     }
 
-    public void addPerkToMember(String memberName, String perkName) {
+    public void addPerkToMember(String member, String perkName) {
         try {
-            String memberQuery = "SELECT id, is_leader FROM members WHERE name = ?";
+            String memberQuery = "SELECT * FROM members WHERE name = ?";
             PreparedStatement memberStmt = connection.prepareStatement(memberQuery);
-            memberStmt.setString(1,memberName);
+            memberStmt.setString(1,member);
             ResultSet memberResult = memberStmt.executeQuery();
 
             if (memberResult.next()) {
                 int memberId = memberResult.getInt("id");
                 boolean isLeader = memberResult.getBoolean("is_leader");
-
-                if (!isLeader || !memberName.equals(memberName)) {
-                    System.out.println("Csak az adott tag vagy a vezető adhat hozzá perket!");
-                    return;
-                }
+                String memberName = memberResult.getString("name");
 
                 String perkQuery = "SELECT id FROM perks WHERE name = ?";
                 PreparedStatement perkStmt = connection.prepareStatement(perkQuery);
@@ -177,7 +178,7 @@ public class GameManager {
                             insertStmt.setInt(2, perkId);
                             insertStmt.executeUpdate();
                             System.out.println("Perk hozzáadva a taghoz!");
-                            saveMembersToFile();
+                            savePerksToFile("perks.txt");
                         } else {
                             System.out.println("A tag már rendelkezik ezzel a perk-kel!");
                         }
@@ -192,35 +193,6 @@ public class GameManager {
             }
         } catch (SQLException e) {
             System.out.println("Hiba a perk hozzáadásakor: " + e.getMessage());
-        }
-    }
-
-    public void listMemberPerks(String memberName) {
-        try {
-            String memberQuery = "SELECT id FROM members WHERE name = ?";
-            PreparedStatement memberStmt = connection.prepareStatement(memberQuery);
-            memberStmt.setString(1,memberName);
-            ResultSet memberResult = memberStmt.executeQuery();
-
-            if (memberResult.next()) {
-                int memberId = memberResult.getInt("id");
-
-                String perksQuery = "SELECT p.name, p.description FROM perks p JOIN members_perks mp ON p.id = mp.perk_id WHERE mp.member_id = ? ORDER BY p.name ASC";
-                PreparedStatement perksStmt = connection.prepareStatement(perksQuery);
-                perksStmt.setInt(1, memberId);
-                ResultSet perksResult = perksStmt.executeQuery();
-
-                System.out.println(memberName + " perk-jei: ");
-                while (perksResult.next()) {
-                    String perkName = perksResult.getString("name");
-                    String perkDescription = perksResult.getString("description");
-                    System.out.println("- " + perkName + ": " + perkDescription);
-                }
-            } else {
-                System.out.println("A megadott tag nem található az adatbázisban!");
-            }
-        } catch (SQLException e) {
-            System.out.println("Hiba a perk-ek listázása során: " + e.getMessage());
         }
     }
 
@@ -265,7 +237,8 @@ public class GameManager {
                         }
 
                         System.out.println("Perk lecserélve: " + oldPerkName + " -> " + newPerkName);
-                        saveMembersToFile();
+                        saveMembersToFile("members.txt");
+                        savePerksToFile("perks.txt");
                     } else {
                         System.out.println("Az új perk nem található az adatbázisban.");
                     }
@@ -280,12 +253,98 @@ public class GameManager {
         }
     }
 
-    private void saveMembersToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("members.txt"))) {
-            oos.writeObject(members);
-            System.out.println("Tagok sikeresen mentve fájlba!");
+    public void saveMembersToFile(String filename) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("members.txt"))) {
+            for (Member member : members) {
+                writer.write(member.getName() + "," + member.isLeader());
+                writer.newLine();
+            }
+            System.out.println("Tagok elmentve a fájlba.");
         } catch (IOException e) {
-            System.out.println("Hiba a tagok mentésekor: " + e.getMessage());
+            System.out.println("Hiba a fájl írása közben: " + e.getMessage());
+        }
+    }
+
+    public void savePerksToFile(String filename) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("perks.txt"))) {
+            oos.writeObject(perks);
+            System.out.println("Perkek elmentve a bináris fájlba.");
+        } catch (IOException e) {
+            System.out.println("Hiba a perkek fájlba írása közben: " + e.getMessage());
+        }
+    }
+
+    public void loadMembersFromFile() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("members.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                String name = parts[0];
+                boolean isLeader = parts[1].equals("1");
+                Member member = new Member(name, isLeader);
+                member.displayInfo();
+            }
+        } catch (IOException e) {
+            System.out.println("Hiba a tagok beolvasása közben: " + e.getMessage());
+        }
+    }
+
+    public void loadPerksFromFile() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("perks.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                String name = parts[0];
+                String description = parts[1];
+                Perk perk = new Perk(name, description);
+                perk.displayInfo();
+            }
+        } catch (IOException e) {
+            System.out.println("Hiba a perkek beolvasása közben: " + e.getMessage());
+        }
+    }
+
+    public void listMembersAndPerks() {
+        try {
+            String query = "SELECT m.name, p.name AS perk_name, p.description " +
+                    "FROM members m " +
+                    "LEFT JOIN members_perks mp ON m.id = mp.member_id " +
+                    "LEFT JOIN perks p ON mp.perk_id = p.id " +
+                    "ORDER BY m.name, p.name";
+
+            PreparedStatement stmt = connection.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+
+            System.out.println("\n--- Tagok és Perkjeik ---");
+            String currentMember = "";
+            boolean hasPerks = false;
+
+            while (rs.next()) {
+                String memberName = rs.getString("name");
+                String perkName = rs.getString("perk_name");
+                String perkDescription = rs.getString("description");
+
+                if (!memberName.equals(currentMember)) {
+                    if (!currentMember.isEmpty() && !hasPerks) {
+                        System.out.println("  (Nincs perk)");
+                    }
+                    System.out.println("\nTag neve: " + memberName);
+                    currentMember = memberName;
+                    hasPerks = false;
+                }
+
+                if (perkName != null) {
+                    System.out.println("  - " + perkName + ": " + perkDescription);
+                    hasPerks = true;
+                }
+            }
+
+            if (!currentMember.isEmpty() && !hasPerks) {
+                System.out.println("  (Nincs perk)");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Hiba a tagok és perkek listázásakor: " + e.getMessage());
         }
     }
 }

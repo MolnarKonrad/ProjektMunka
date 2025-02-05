@@ -71,6 +71,7 @@ public class Main {
                 case 2:
                     System.out.print("Add meg a tag nevét, akit el szeretnél távolítani: ");
                     String memberToRemove = scanner.nextLine();
+                    gameManager.removeMemberFromDatabase(memberToRemove);
                     boolean wasLeaderRemoved = gameManager.isLeader(memberToRemove);
 
                     if (wasLeaderRemoved) {

@@ -17,10 +17,6 @@ public class Member extends BaseEntity implements Displayable{
         return isLeader;
     }
 
-    public void setLeader(boolean leader) {
-        isLeader = leader;
-    }
-
     @Override
     public void displayInfo() {
         System.out.println("Tag neve: " + name + ", Leader: " + (isLeader ? "Igen" : "Nem"));

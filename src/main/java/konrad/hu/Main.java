@@ -16,6 +16,7 @@ public class Main {
             System.out.println("A tag hozzáadva: " + newMemberName + " (Leader)");
             showLeaderMenu(gameManager, scanner);
         } else {
+            Member member;
             if (!gameManager.hasActiveLeader()) {
                 System.out.println("Jelenleg nincs aktív vezető az adatbázisban.");
                 System.out.print("Kérlek add meg a tag nevét, aki vezető lesz: ");
@@ -26,8 +27,8 @@ public class Main {
             } else {
                 System.out.print("Kérlek add meg a neved: ");
                 userName = scanner.nextLine();
+                member = gameManager.findMemberByName(userName);
 
-                Member member = gameManager.findMemberByName(userName);
                 if (member == null) {
                     System.out.println("Hiba: A megadott felhasználó nem található az adatbázisban.");
                     scanner.close();
@@ -65,35 +66,38 @@ public class Main {
                 case 1:
                     System.out.println("Tag neve: ");
                     String name = scanner.nextLine();
-                    boolean isLeader = false;
-                    gameManager.addMemberToDatabase(new Member(name, isLeader));
+                    gameManager.addMemberToDatabase(new Member(name, false));
                     break;
                 case 2:
                     System.out.print("Add meg a tag nevét, akit el szeretnél távolítani: ");
                     String memberToRemove = scanner.nextLine();
-                    gameManager.removeMemberFromDatabase(memberToRemove);
                     boolean wasLeaderRemoved = gameManager.isLeader(memberToRemove);
+                    gameManager.removeMemberFromDatabase(memberToRemove);
 
                     if (wasLeaderRemoved) {
                         System.out.println("A kiválasztott tag, aki vezető volt, eltávolítva.");
-                        System.out.println("Nincs aktuális vezető, a program leáll.");
-                        scanner.close();
+                        System.out.println("Nincs aktuális vezető, add meg a vezető nevét!");
+                        name = scanner.nextLine();
+                        Member member = gameManager.findMemberByName(name);
+
+                        if (member == null) {
+                            gameManager.addMemberToDatabase(new Member(name, true));
+                            showLeaderMenu(gameManager, scanner);
+                        } else {
+                            gameManager.promoteMemberToLeader(name);
+                            showLeaderMenu(gameManager, scanner);
+                        }
                         return;
                     } else {
                         System.out.println("Tag eltávolítva: " + memberToRemove);
                     }
                     break;
                 case 3:
-                    System.out.print("Tag neve, akinek perk hozzáadása: ");
+                    System.out.print("Tag neve, akihez perk-et szeretnél hozzáadni: ");
                     String targetMemberName = scanner.nextLine();
-                    if (!userName.equals(targetMemberName)) {
-                        System.out.println("Csak az adott tag adhat hozzá perket!");
-                        return;
-                    } else {
-                        System.out.print("Megadott perk neve: ");
-                        String perkName = scanner.nextLine();
-                        gameManager.addPerkToMember(targetMemberName, perkName);
-                    }
+                    System.out.print("Megadott perk neve: ");
+                    String perkName = scanner.nextLine();
+                    gameManager.addPerkToMember(targetMemberName, perkName);
                     break;
                 case 4:
                     System.out.print("Tag neve, akinek perkjét cserélni szeretnéd: ");
@@ -123,8 +127,8 @@ public class Main {
         while (true) {
 
             System.out.println("\n --- Menük ---");
-            System.out.println("1. Perk hozzáadása taghoz");
-            System.out.println("2. Tag perk-jének cseréje");
+            System.out.println("1. Perk hozzáadása");
+            System.out.println("2. Perk cseréje");
             System.out.println("3. Információ az aktuális tagokról és azok perkjeiről");
             System.out.println("4. Kilépés");
 
@@ -134,26 +138,16 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    System.out.print("Tag neve, akinek perk hozzáadása: ");
-                    String targetMemberName = scanner.nextLine();
-                    if (!userName.equals(targetMemberName)) {
-                        System.out.println("Csak az adott tag vagy a vezető adhat hozzá perket!");
-                        showMemberMenu(gameManager, scanner);
-                        return;
-                    } else {
-                        System.out.print("Megadott perk neve: ");
-                        String perkName = scanner.nextLine();
-                        gameManager.addPerkToMember(targetMemberName, perkName);
-                    }
+                    System.out.print("A perk neve: ");
+                    String perkName = scanner.nextLine();
+                    gameManager.addPerkToMember(userName, perkName);
                     break;
                 case 2:
-                    System.out.print("Tag neve, akinek perkjét cserélni szeretnéd: ");
-                    String memberNameForReplace = scanner.nextLine();
                     System.out.print("Régi perk neve: ");
                     String oldPerkName = scanner.nextLine();
                     System.out.print("Új perk neve: ");
                     String newPerkName = scanner.nextLine();
-                    gameManager.replaceMemberPerk(memberNameForReplace, oldPerkName, newPerkName);
+                    gameManager.replaceMemberPerk(userName, oldPerkName, newPerkName);
                     break;
                 case 3:
                     gameManager.listMembersAndPerks();

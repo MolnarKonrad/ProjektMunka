@@ -4,6 +4,7 @@ import java.io.*;
 import java.sql.*;
 import java.util.*;
 
+@SuppressWarnings("ALL")
 public class GameManager {
     private Set<Member> members;
     private Map<String, Perk> perks;
@@ -53,19 +54,16 @@ public class GameManager {
     }
 
     public void addMemberToDatabase(Member member){
-
         String query = "INSERT INTO members (name, is_leader) VALUES (?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, member.getName());
             stmt.setBoolean(2, member.isLeader());
             stmt.executeUpdate();
             members.add(member);
-            saveMembersToFile("members.txt");
             System.out.println("Tag hozzáadva: " + member.getName());
         } catch (SQLException e) {
             System.out.println("Hiba a tag hozzáadásakor: " + e.getMessage());
         }
-        saveMembersToFile("members.txt");
     }
 
     public boolean removeMemberFromDatabase(String memberNameToDelete) {
@@ -178,7 +176,6 @@ public class GameManager {
                             insertStmt.setInt(2, perkId);
                             insertStmt.executeUpdate();
                             System.out.println("Perk hozzáadva a taghoz!");
-                            savePerksToFile("perks.txt");
                         } else {
                             System.out.println("A tag már rendelkezik ezzel a perk-kel!");
                         }
@@ -237,8 +234,6 @@ public class GameManager {
                         }
 
                         System.out.println("Perk lecserélve: " + oldPerkName + " -> " + newPerkName);
-                        saveMembersToFile("members.txt");
-                        savePerksToFile("perks.txt");
                     } else {
                         System.out.println("Az új perk nem található az adatbázisban.");
                     }
@@ -250,57 +245,6 @@ public class GameManager {
             }
         } catch (SQLException e) {
             System.out.println("Hiba a perk lecserélésekor: " + e.getMessage());
-        }
-    }
-
-    public void saveMembersToFile(String filename) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("members.txt"))) {
-            for (Member member : members) {
-                writer.write(member.getName() + "," + member.isLeader());
-                writer.newLine();
-            }
-            System.out.println("Tagok elmentve a fájlba.");
-        } catch (IOException e) {
-            System.out.println("Hiba a fájl írása közben: " + e.getMessage());
-        }
-    }
-
-    public void savePerksToFile(String filename) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("perks.txt"))) {
-            oos.writeObject(perks);
-            System.out.println("Perkek elmentve a bináris fájlba.");
-        } catch (IOException e) {
-            System.out.println("Hiba a perkek fájlba írása közben: " + e.getMessage());
-        }
-    }
-
-    public void loadMembersFromFile() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("members.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                String name = parts[0];
-                boolean isLeader = parts[1].equals("1");
-                Member member = new Member(name, isLeader);
-                member.displayInfo();
-            }
-        } catch (IOException e) {
-            System.out.println("Hiba a tagok beolvasása közben: " + e.getMessage());
-        }
-    }
-
-    public void loadPerksFromFile() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("perks.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                String name = parts[0];
-                String description = parts[1];
-                Perk perk = new Perk(name, description);
-                perk.displayInfo();
-            }
-        } catch (IOException e) {
-            System.out.println("Hiba a perkek beolvasása közben: " + e.getMessage());
         }
     }
 
@@ -346,5 +290,20 @@ public class GameManager {
         } catch (SQLException e) {
             System.out.println("Hiba a tagok és perkek listázásakor: " + e.getMessage());
         }
+    }
+
+    public boolean promoteMemberToLeader(String memberName) {
+        String query = "UPDATE members SET is_leader = true WHERE name = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, memberName);
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("A tag sikeresen vezetővé lett téve: " + memberName);
+                return true;
+            }
+        } catch (SQLException e) {
+            System.out.println("Hiba a tag vezetővé tételekor: " + e.getMessage());
+        }
+        return false;
     }
 }

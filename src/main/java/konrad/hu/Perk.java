@@ -1,23 +1,16 @@
 package konrad.hu;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Perk extends BaseEntity implements Displayable {
-
+public class Perk extends BaseEntity implements Displayable, Serializable {
+    private static final long serialVersionUID = 1L;
     private String description;
 
     public Perk() { }
 
     public Perk(String name, String description) {
         super(name);
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
         this.description = description;
     }
 

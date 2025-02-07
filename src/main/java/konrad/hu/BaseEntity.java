@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public abstract class BaseEntity implements Serializable{
+    private static final long serialVersionUID = 1L;
     protected String name;
 
     public BaseEntity(){ }
@@ -14,10 +15,6 @@ public abstract class BaseEntity implements Serializable{
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name){
-        this.name = name;
     }
 
     @Override

@@ -1,1 +1,1 @@
-gomboc,false
+Géza,false

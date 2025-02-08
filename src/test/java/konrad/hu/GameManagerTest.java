@@ -2,13 +2,16 @@ package konrad.hu;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameManagerTest {
     private GameManager gameManager;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws SQLException {
         gameManager = new GameManager();
     }
 

@@ -139,8 +139,9 @@ public static boolean databaseCheck() {
             System.out.println("2. Tag eltávolítása");
             System.out.println("3. Perk hozzáadása taghoz");
             System.out.println("4. Tag perk-jének cseréje");
-            System.out.println("5. Információ az aktuális tagokról és azok perkjeiről");
-            System.out.println("6. Kilépés");
+            System.out.println("5. Az aktuális tagok és azok perkjeinek kimentése az Info.txt fájlba");
+            System.out.println("6. Az info.txt fájl tartalmának megjelenitése");
+            System.out.println("7. Kilépés");
 
             System.out.println("Válassz egy lehetőséget: ");
             int choice = scanner.nextInt();
@@ -193,9 +194,12 @@ public static boolean databaseCheck() {
                     database.replaceMemberPerk(memberNameForReplace, oldPerkName, newPerkName);
                     break;
                 case 5:
-                    database.listMembersAndPerks();
+                    database.saveMembersAndPerksToFile();
                     break;
                 case 6:
+                    database.loadFromFile("Info.txt");
+                    break;
+                case 7:
                     System.out.println("Kilépés...");
                     scanner.close();
                     return;
@@ -219,8 +223,9 @@ public static boolean databaseCheck() {
             System.out.println("\n --- Menük ---");
             System.out.println("1. Perk hozzáadása");
             System.out.println("2. Perk cseréje");
-            System.out.println("3. Információ az aktuális tagokról és azok perkjeiről");
-            System.out.println("4. Kilépés");
+            System.out.println("3. Az aktuális tagok és azok perkjeinek kimentése az Info.txt fájlba");
+            System.out.println("4. Az info.txt fájl tartalmának megjelenitése");
+            System.out.println("5. Kilépés");
 
             System.out.println("Válassz egy lehetőséget: ");
             int choice = scanner.nextInt();
@@ -240,9 +245,12 @@ public static boolean databaseCheck() {
                     database.replaceMemberPerk(userName, oldPerkName, newPerkName);
                     break;
                 case 3:
-                    database.listMembersAndPerks();
+                    database.saveMembersAndPerksToFile();
                     break;
                 case 4:
+                    database.loadFromFile("Info.txt");
+                    break;
+                case 5:
                     System.out.println("Kilépés...");
                     scanner.close();
                     return;

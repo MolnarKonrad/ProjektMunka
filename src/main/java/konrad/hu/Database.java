@@ -70,9 +70,14 @@ public interface Database {
     void replaceMemberPerk(String memberName, String oldPerkName, String newPerkName);
 
     /**
-     * Kiírja az összes tagot és azok perkjeit.
+     * Kimenti az összes tagot és azok perkjeit az Info.txt fájlba.
      */
-    void listMembersAndPerks();
+    void saveMembersAndPerksToFile();
+
+    /**
+     * Betölti az Info.txt fájl tartalmát, majd megjeleniti azt a képernyőn.
+     */
+    void loadFromFile(String fileName);
 
     /**
      * Előlépteti a megadott tagot vezetővé.

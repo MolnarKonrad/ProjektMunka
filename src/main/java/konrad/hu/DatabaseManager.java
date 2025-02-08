@@ -1,5 +1,6 @@
 package konrad.hu;
 
+import java.io.*;
 import java.sql.*;
 import java.util.Set;
 
@@ -238,8 +239,10 @@ public class DatabaseManager implements Database{
     }
 
     @Override
-    public void listMembersAndPerks() {
-        try {
+    public void saveMembersAndPerksToFile() {
+        String fileName = "Info.txt";
+        
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             String query = "SELECT m.name, p.name AS perk_name, p.description " +
                     "FROM members m " +
                     "LEFT JOIN members_perks mp ON m.id = mp.member_id " +
@@ -249,7 +252,7 @@ public class DatabaseManager implements Database{
             PreparedStatement stmt = connection.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
 
-            System.out.println("\n--- Tagok és Perkjeik ---");
+            writer.write("--- Tagok és Perkjeik ---\n");
             String currentMember = "";
             boolean hasPerks = false;
 
@@ -260,25 +263,40 @@ public class DatabaseManager implements Database{
 
                 if (!memberName.equals(currentMember)) {
                     if (!currentMember.isEmpty() && !hasPerks) {
-                        System.out.println("  (Nincs perk)");
+                        writer.write("  (Nincs perk)\n");
                     }
-                    System.out.println("\nTag neve: " + memberName);
+                    writer.write("\nTag neve: " + memberName + "\n");
                     currentMember = memberName;
                     hasPerks = false;
                 }
 
                 if (perkName != null) {
-                    System.out.println("  - " + perkName + ": " + perkDescription);
+                    writer.write("  - " + perkName + ": " + perkDescription + "\n");
                     hasPerks = true;
                 }
             }
 
             if (!currentMember.isEmpty() && !hasPerks) {
-                System.out.println("  (Nincs perk)");
+                writer.write("  (Nincs perk)\n");
             }
+
+            System.out.println("Az adatok kimentve az Info.txt fájlba!");
 
         } catch (SQLException e) {
             System.out.println("Hiba a tagok és perkek listázásakor: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Hiba a fájl írásakor: " + e.getMessage());
+        }
+    }
+
+    public void loadFromFile(String fileName) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.out.println("Hiba a fájl beolvasásakor: " + e.getMessage());
         }
     }
 

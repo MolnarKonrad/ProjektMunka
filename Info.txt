@@ -1,0 +1,22 @@
+--- Tagok és Perkjeik ---
+
+Tag neve: Béla
+  - Compost Bin: When in your backpack, if there is Spoiled Food in your Backpack, 1 - 3 Spoiled Foods will be consumed every 10 - 5 minutes, and be turned into Mushrooms or random Fertilizer
+
+Tag neve: Géza
+  (Nincs perk)
+
+Tag neve: Gomboc
+  - Combo Chipset: Turn Electronic Parts, Metal Scrap, and Parts into the Combo Chipset using the Supplies Workbench. Can be sold for 12k energy links
+  - Crystal Transformation: Turn Stardust Source and alloy ingots into various types of Crystals at the Electric Furnace
+  - Explosive Sack: When in your backpack, there is a 30% - 60% chance to salvage Explosive Compound after using High-Explosive Grenades, Shrapnel Grenades, and Simple Explosives. There is a 30% - 60% chance to salvage Sulfur after using Molotov Cocktails and Thermite Grenades
+
+Tag neve: IamMKey
+  - Combo Chipset: Turn Electronic Parts, Metal Scrap, and Parts into the Combo Chipset using the Supplies Workbench. Can be sold for 12k energy links
+  - Compost Bin: When in your backpack, if there is Spoiled Food in your Backpack, 1 - 3 Spoiled Foods will be consumed every 10 - 5 minutes, and be turned into Mushrooms or random Fertilizer
+
+Tag neve: Lilly
+  (Nincs perk)
+
+Tag neve: Mari
+  - Combo Chipset: Turn Electronic Parts, Metal Scrap, and Parts into the Combo Chipset using the Supplies Workbench. Can be sold for 12k energy links

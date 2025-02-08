@@ -109,10 +109,10 @@ public class DatabaseManagerTest {
     }
 
     @Test
-    public void testListMembersAndPerks() throws SQLException {
+    public void testSaveMembersAndPerksToFile() throws SQLException {
         databaseManager.addMemberToDatabase(new Member("Eve", false));
         databaseManager.addPerkToMember("Eve", "Invisibility");
-        assertDoesNotThrow(() -> databaseManager.listMembersAndPerks());
+        assertDoesNotThrow(() -> databaseManager.saveMembersAndPerksToFile());
     }
 
     @Test

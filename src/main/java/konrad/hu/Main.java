@@ -1,9 +1,12 @@
 package konrad.hu;
 
-public class Main {
-    public static void main(String[] args) {
+import java.sql.SQLException;
 
-        GameManager.databaseCheck();
+public class Main {
+    public static void main(String[] args) throws SQLException {
+
+        GameManager gameManager = new GameManager();
+        gameManager.databaseCheck();
 
     }
 }

@@ -53,7 +53,6 @@ public class DatabaseManager implements Database{
         } catch (SQLException e) {
             System.out.println("Hiba a tag hozzáadásakor: " + e.getMessage());
         }
-
     }
 
     @Override

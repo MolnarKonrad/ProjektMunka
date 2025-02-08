@@ -9,7 +9,7 @@ public class GameManager {
     static Scanner scanner = new Scanner(System.in);
     static String userName;
     private Connection connection;
-    private static Database database;
+    static Database database;
     private Set<Member> members;
     private Map<String, Perk> perks;
 

@@ -3,9 +3,22 @@ package konrad.hu;
 import java.sql.*;
 import java.util.Set;
 
+/**
+ * A DatabaseManager osztály megvalósítja a Database interfészt,
+ * és kezeli az adatbázis műveleteit a tagok és perkek kezeléséhez.
+ */
+
 public class DatabaseManager implements Database{
     private final Connection connection;
     private final Set<Member> members;
+
+    /**
+     * Konstruktor, amely inicializálja a DatabaseManager példányt
+     * az adatbázis kapcsolat és a tagok halmazának megadásával.
+     *
+     * @param connection a kapcsolat az adatbázissal
+     * @param members    a tagok halmaza
+     */
 
     public DatabaseManager(Connection connection, Set<Member> members) {
         this.connection = connection;

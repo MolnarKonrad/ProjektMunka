@@ -4,6 +4,11 @@ import java.sql.*;
 import java.util.*;
 import static java.sql.DriverManager.getConnection;
 
+/**
+ * A GameManager osztály kezeli a játék logikáját, beleértve az adatbázis kapcsolódást,
+ * a tagok és perkek kezelését, valamint a felhasználói interakciókat.
+ */
+
 @SuppressWarnings("ALL")
 public class GameManager {
     static Scanner scanner = new Scanner(System.in);
@@ -13,6 +18,13 @@ public class GameManager {
     private Set<Member> members;
     private Map<String, Perk> perks;
 
+    /**
+     * Konstruktor, amely inicializálja a GameManager példányt,
+     * létrehozza a kapcsolatot az adatbázissal, és inicializálja
+     * a tagok és perkek halmazát.
+     *
+     * @throws SQLException ha hiba lép fel az adatbázis kapcsolat létrehozásakor
+     */
     public GameManager() throws SQLException {
         members = new HashSet<>();
         perks = new HashMap<>();
@@ -20,6 +32,12 @@ public class GameManager {
         database = new DatabaseManager(connection, members);
     }
 
+    /**
+     * Kapcsolódik az adatbázishoz.
+     *
+     * Ha a kapcsolat sikeres, kiírja az adatbázis kapcsolat létrejöttét.
+     * Ha hiba lép fel, kiírja a hibaüzenetet.
+     */
     public void connectToDatabase() {
         try {
             connection = getConnection("jdbc:mysql://localhost:3306/game_db","root","");
@@ -30,6 +48,13 @@ public class GameManager {
         }
     }
 
+    /**
+     * Ellenőrzi, hogy a megadott tagot hozzá lehet-e adni az adatbázishoz.
+     *
+     * @param member a hozzáadandó Member objektum
+     * @return true, ha a tag hozzáadható; false, ha nem
+     * @throws IllegalArgumentException ha a név megadása kötelező, vagy ha a tag már létezik
+     */
     public boolean addTestMemberToDatabase(Member member) {
         if (member.getName() == null || member.getName().trim().isEmpty()) {
             throw new IllegalArgumentException("A név megadása kötelező.");
@@ -43,10 +68,25 @@ public class GameManager {
         return true;
     }
 
+    /**
+     * Ellenőrzi, hogy a megadott tag létezik-e az adatbázisban.
+     *
+     * @param name a tag neve
+     * @return true, ha a tag létezik; false, ha nem
+     */
     private boolean isMemberExists(String name) {
         return false;
     }
 
+    /**
+     * Ellenőrzi az adatbázis állapotát, és kezeli a felhasználói interakciókat.
+     *
+     * Ha az adatbázis üres, új vezetőt kér be a felhasználótól.
+     * Ha van aktív vezető, a felhasználótól kéri a nevét, és
+     * a megfelelő menüt jeleníti meg.
+     *
+     * @return true, ha a felhasználó kilépett; false, ha nem
+     */
 public static boolean databaseCheck() {
     if (database.isDatabaseEmpty()) {
         System.out.print("Az adatbázis üres. Kérlek add meg a tag nevét, aki vezető lesz: ");
@@ -84,6 +124,12 @@ public static boolean databaseCheck() {
     return false;
     }
 
+    /**
+     * Megjeleníti a vezetői menüt, ahol a vezető különböző műveleteket végezhet.
+     *
+     * @param database az adatbázis, amelyet a menü használ
+     * @param scanner a felhasználói bemenet kezelésére
+     */
     public static void showLeaderMenu(Database database, Scanner scanner){
 
         while (true) {
@@ -160,6 +206,12 @@ public static boolean databaseCheck() {
         }
     }
 
+    /**
+     * Megjeleníti a tagi menüt, ahol a tag különböző műveleteket végezhet.
+     *
+     * @param database az adatbázis, amelyet a menü használ
+     * @param scanner a felhasználói bemenet kezelésére
+     */
     private static void showMemberMenu(Database database, Scanner scanner){
 
         while (true) {
